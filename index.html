@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>amadum</title>
+    <title>Amadum Puzzle Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>amadum</h1>
+    <h1>Amadum Puzzle Game</h1>
     
     <!-- Status Message Box -->
     <div id="status-message" class="hidden">Status: Piece has been locked into place</div>
@@ -14,7 +14,7 @@
     <!-- Predefined Puzzle Controls -->
     <div class="controls">
         <button id="next-puzzle">Next Puzzle</button>
-        <button id="debug-puzzle">Load 2x2 Puzzle (Debug)</button> <!-- Debug Button Added -->
+        <button id="debug-puzzle">Load 2x2 Puzzle (Debug)</button>
     </div>
     
     <!-- Custom Puzzle Creation Form -->
@@ -26,8 +26,12 @@
                 <input type="file" id="custom-image" accept="image/*" required>
             </div>
             <div class="form-group">
-                <label for="num-pieces">Number of Pieces (2-40):</label>
-                <input type="number" id="num-pieces" min="2" max="40" value="20" required>
+                <label for="num-rows">Number of Rows (2-10):</label>
+                <input type="number" id="num-rows" min="2" max="10" value="4" required>
+            </div>
+            <div class="form-group">
+                <label for="num-cols">Number of Columns (2-10):</label>
+                <input type="number" id="num-cols" min="2" max="10" value="4" required>
             </div>
             <button type="submit">Create Puzzle</button>
         </form>
@@ -35,10 +39,11 @@
     
     <!-- Puzzle Container -->
     <div id="puzzle-wrapper">
-        <div id="puzzle-container"></div>
+        <div id="puzzle-container">
+            <!-- Puzzle pieces will be appended here -->
+        </div>
     </div>
     
     <script src="script.js"></script>
 </body>
 </html>
-    

@@ -3,13 +3,15 @@
 // List of predefined images to be used in the puzzle
 const images = [
     'image1.jpg',
-    'image2.jpg'
+    'image2.jpg',
     // Add more image paths as needed
 ];
 
 // Configuration
-const MIN_PIECES = 2; // Updated to 2 to ensure no puzzle with 1 piece
-const MAX_PIECES = 100;
+const MIN_ROWS = 2; // Minimum number of rows
+const MAX_ROWS = 10; // Maximum number of rows
+const MIN_COLS = 2; // Minimum number of columns
+const MAX_COLS = 10; // Maximum number of columns
 
 // Get DOM elements
 const container = document.getElementById('puzzle-container');
@@ -17,7 +19,8 @@ const nextButton = document.getElementById('next-puzzle');
 const debugButton = document.getElementById('debug-puzzle'); // Debug Button
 const customPuzzleForm = document.getElementById('custom-puzzle-form');
 const customImageInput = document.getElementById('custom-image');
-const numPiecesInput = document.getElementById('num-pieces');
+const numRowsInput = document.getElementById('num-rows');
+const numColsInput = document.getElementById('num-cols');
 const statusMessage = document.getElementById('status-message'); // Status message box
 
 // Game state
@@ -29,7 +32,7 @@ let isCustomPuzzle = false; // Flag to determine if the current puzzle is custom
 let statusTimeout; // To manage status message timeout
 
 // Initialize the first puzzle
-loadNextPuzzle();
+window.onload = loadNextPuzzle;
 
 // Event listener for "Next Puzzle" button
 nextButton.addEventListener('click', loadNextPuzzle);
@@ -44,13 +47,19 @@ customPuzzleForm.addEventListener('submit', handleCustomPuzzle);
 function loadNextPuzzle() {
     isCustomPuzzle = false;
     container.innerHTML = '';
+    setGridSize(4, 4); // Default grid size for predefined puzzles (e.g., 4x4)
     pieces = [];
+
+    if (images.length === 0) {
+        alert('No predefined images available.');
+        return;
+    }
 
     currentImageIndex = (currentImageIndex + 1) % images.length;
     const imageSrc = images[currentImageIndex];
     console.log(`Selected image: ${imageSrc}`);
 
-    loadImageAndCreatePuzzle(imageSrc, getRandomIntExcluding(MIN_PIECES, MAX_PIECES, 1));
+    loadImageAndCreatePuzzle(imageSrc, rows, cols);
 }
 
 // Function to handle custom puzzle creation
@@ -58,24 +67,29 @@ function handleCustomPuzzle(event) {
     event.preventDefault();
 
     const file = customImageInput.files[0];
-    const numPieces = parseInt(numPiecesInput.value);
+    const numRows = parseInt(numRowsInput.value);
+    const numCols = parseInt(numColsInput.value);
 
     if (!file) {
         alert('Please upload an image.');
         return;
     }
 
-    if (isNaN(numPieces) || numPieces < MIN_PIECES || numPieces > MAX_PIECES) {
-        alert(`Please enter a number of pieces between ${MIN_PIECES} and ${MAX_PIECES}.`);
+    if (
+        isNaN(numRows) || numRows < MIN_ROWS || numRows > MAX_ROWS ||
+        isNaN(numCols) || numCols < MIN_COLS || numCols > MAX_COLS
+    ) {
+        alert(`Please enter number of rows between ${MIN_ROWS} and ${MAX_ROWS} and number of columns between ${MIN_COLS} and ${MAX_COLS}.`);
         return;
     }
 
     const reader = new FileReader();
     reader.onload = function(e) {
         const imageSrc = e.target.result;
-        console.log(`Custom puzzle created with ${numPieces} pieces.`);
+        console.log(`Custom puzzle created with ${numRows} rows x ${numCols} columns.`);
         isCustomPuzzle = true;
-        loadImageAndCreatePuzzle(imageSrc, numPieces);
+        setGridSize(numRows, numCols);
+        loadImageAndCreatePuzzle(imageSrc, numRows, numCols);
     };
     reader.onerror = function() {
         alert('Failed to read the image file. Please try again.');
@@ -91,14 +105,24 @@ function loadDebugPuzzle() {
     }
     isCustomPuzzle = false;
     container.innerHTML = '';
+    setGridSize(2, 2); // 2x2 grid = 4 pieces
     pieces = [];
     const imageSrc = images[0]; // Using the first image for debug
     console.log('Loading debug 2x2 puzzle');
-    loadImageAndCreatePuzzle(imageSrc, 4); // 2x2 grid = 4 pieces
+    loadImageAndCreatePuzzle(imageSrc, rows, cols);
+}
+
+// Function to set CSS variables for grid size
+function setGridSize(numRows, numCols) {
+    rows = numRows;
+    cols = numCols;
+    container.style.setProperty('--rows', rows);
+    container.style.setProperty('--cols', cols);
+    console.log(`Grid size set to ${rows} rows x ${cols} columns`);
 }
 
 // Function to load an image and create the puzzle
-function loadImageAndCreatePuzzle(imageSrc, numPieces) {
+function loadImageAndCreatePuzzle(imageSrc, numRows, numCols) {
     container.innerHTML = '';
     pieces = [];
 
@@ -114,12 +138,6 @@ function loadImageAndCreatePuzzle(imageSrc, numPieces) {
         container.style.paddingBottom = `${aspectRatio}%`;
         console.log(`Set container aspect ratio to ${aspectRatio}%`);
 
-        // Determine number of pieces
-        const actualNumPieces = Math.min(Math.max(numPieces, MIN_PIECES), MAX_PIECES);
-        console.log(`Number of pieces: ${actualNumPieces}`);
-        const grid = determineGrid(actualNumPieces);
-        rows = grid.rows;
-        cols = grid.cols;
         console.log(`Grid size: ${rows} rows x ${cols} columns`);
 
         if (rows <= 1 || cols <= 1) { // Extra safety
@@ -128,7 +146,7 @@ function loadImageAndCreatePuzzle(imageSrc, numPieces) {
             return;
         }
 
-        // Create pieces
+        // Create puzzle pieces
         const pieceWidth = 100 / cols; // Percentage width
         const pieceHeight = 100 / rows; // Percentage height
 
@@ -143,6 +161,8 @@ function loadImageAndCreatePuzzle(imageSrc, numPieces) {
                 piece.style.backgroundPosition = `${(-x * 100) / (cols - 1)}% ${(-y * 100) / (rows - 1)}%`;
                 piece.dataset.correctX = x;
                 piece.dataset.correctY = y;
+                piece.dataset.row = y;
+                piece.dataset.col = x;
 
                 pieces.push(piece);
             }
@@ -156,6 +176,7 @@ function loadImageAndCreatePuzzle(imageSrc, numPieces) {
             container.appendChild(piece);
             randomizePosition(piece);
             enableDrag(piece);
+            enableUnlock(piece); // Enable unlocking
         });
 
         console.log('Puzzle pieces appended and draggable.');
@@ -167,81 +188,6 @@ function loadImageAndCreatePuzzle(imageSrc, numPieces) {
     };
 }
 
-// Function to determine grid (rows and cols) based on desired number of pieces
-function determineGrid(desiredPieces) {
-    // Ensure a minimum grid size to avoid 1-row or 1-column puzzles
-    const MIN_ROWS = 2;
-    const MIN_COLS = 2;
-    const MAX_DIFF = 5; // Maximum allowed difference between rows and cols
-
-    let bestGrid = null;
-    let smallestDiff = Infinity;
-
-    // Iterate through possible row counts
-    for (let r = MIN_ROWS; r <= desiredPieces; r++) {
-        let c = Math.ceil(desiredPieces / r);
-        if (c < MIN_COLS) continue; // Ensure minimum columns
-
-        // Check if the difference between rows and columns is within the allowed range
-        if (Math.abs(r - c) > MAX_DIFF) continue;
-
-        let totalPieces = r * c;
-        let diff = Math.abs(totalPieces - desiredPieces);
-
-        // Select the grid with the smallest difference
-        if (diff < smallestDiff) {
-            smallestDiff = diff;
-            bestGrid = { rows: r, cols: c };
-        }
-
-        // If exact match is found, return immediately
-        if (diff === 0) {
-            break;
-        }
-    }
-
-    // If a suitable grid was found within the allowed difference
-    if (bestGrid) {
-        console.log(`Optimal grid found: ${bestGrid.rows} rows x ${bestGrid.cols} cols`);
-        return bestGrid;
-    }
-
-    // Fallback: Find the closest grid without considering the difference constraint
-    let closest = [MIN_ROWS, Math.ceil(desiredPieces / MIN_ROWS)];
-    let minDiff = Math.abs(closest[0] * closest[1] - desiredPieces);
-
-    for (let r = MIN_ROWS; r <= desiredPieces; r++) {
-        let c = Math.ceil(desiredPieces / r);
-        if (c < MIN_COLS) continue; // Ensure minimum columns
-        let totalPieces = r * c;
-        let diff = Math.abs(totalPieces - desiredPieces);
-        if (diff < minDiff) {
-            minDiff = diff;
-            closest = [r, c];
-        }
-        if (minDiff === 0) break;
-    }
-
-    console.log(`Closest grid without difference constraint: ${closest[0]} rows x ${closest[1]} cols`);
-    return { rows: closest[0], cols: closest[1] };
-}
-
-// Function to get a random integer between min and max (inclusive), excluding specific numbers
-function getRandomIntExcluding(min, max, exclude) {
-    let randomInt;
-
-    // Edge case: if the range is too small to exclude the number
-    if (max - min + 1 <= 1 && min === exclude) {
-        throw new Error('No valid numbers available to generate.');
-    }
-
-    do {
-        randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
-    } while (randomInt === exclude);
-
-    return randomInt;
-}
-
 // Shuffle an array using Fisher-Yates algorithm
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -250,16 +196,9 @@ function shuffleArray(array) {
     }
 }
 
-// Function to get a random integer between min and max (inclusive), but never returns 1
+// Function to get a random integer between min and max (inclusive)
 function getRandomInt(min, max) {
-    let randomInt;
-
-    // Keep generating a random number until it's not 1
-    do {
-        randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
-    } while (randomInt === 1);
-
-    return randomInt;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 // Randomize the position of a piece within the container
@@ -346,7 +285,7 @@ function enableDrag(element) {
         offsetY = clientY - rect.top;
 
         // Bring the dragged piece to the front
-        element.style.zIndex = 1000;
+        element.style.zIndex = 3; // Above grid lines and locked pieces
     }
 
     function moveDrag(clientX, clientY) {
@@ -365,33 +304,64 @@ function enableDrag(element) {
 
     function endDrag() {
         isDragging = false;
-        element.style.zIndex = 1; // Reset z-index
-        checkPiecePosition(element);
+        element.style.zIndex = 2; // Reset z-index
+        snapToGrid(element);
     }
 }
 
-// Check if the piece is in the correct position (with a tolerance)
-function checkPiecePosition(piece) {
+// Enable unlocking of a locked piece via double-click
+function enableUnlock(element) {
+    element.addEventListener('dblclick', () => {
+        if (element.classList.contains('locked')) {
+            element.classList.remove('locked');
+            showStatusMessage('Status: Piece has been unlocked');
+        }
+    });
+}
+
+// Function to snap a piece to the nearest grid slot
+function snapToGrid(piece) {
     const containerRect = container.getBoundingClientRect();
-    const pieceWidth = containerRect.width / cols;
-    const pieceHeight = containerRect.height / rows;
+    const pieceRect = piece.getBoundingClientRect();
 
-    const currentX = parseFloat(piece.style.left);
-    const currentY = parseFloat(piece.style.top);
+    const pieceCenterX = pieceRect.left + pieceRect.width / 2 - containerRect.left;
+    const pieceCenterY = pieceRect.top + pieceRect.height / 2 - containerRect.top;
 
-    const correctX = piece.dataset.correctX * pieceWidth;
-    const correctY = piece.dataset.correctY * pieceHeight;
+    // Calculate which grid slot the piece center is closest to
+    const slotWidth = containerRect.width / cols;
+    const slotHeight = containerRect.height / rows;
 
-    const toleranceX = pieceWidth * 0.15; // 15% of piece width
-    const toleranceY = pieceHeight * 0.15; // 15% of piece height
+    let closestCol = Math.floor(pieceCenterX / slotWidth);
+    let closestRow = Math.floor(pieceCenterY / slotHeight);
 
-    if (
-        Math.abs(currentX - correctX) < toleranceX &&
-        Math.abs(currentY - correctY) < toleranceY
-    ) {
-        // Snap to correct position
-        piece.style.left = `${correctX}px`;
-        piece.style.top = `${correctY}px`;
+    // Ensure the closest grid slot is within bounds
+    closestCol = Math.min(Math.max(closestCol, 0), cols - 1);
+    closestRow = Math.min(Math.max(closestRow, 0), rows - 1);
+
+    const slotLeft = closestCol * slotWidth;
+    const slotTop = closestRow * slotHeight;
+
+    const toleranceX = slotWidth * 0.3; // 30% of slot width
+    const toleranceY = slotHeight * 0.3; // 30% of slot height
+
+    const distanceX = Math.abs(parseFloat(piece.style.left) - slotLeft);
+    const distanceY = Math.abs(parseFloat(piece.style.top) - slotTop);
+
+    if (distanceX < toleranceX && distanceY < toleranceY) {
+        // Snap to the slot
+        piece.style.left = `${slotLeft}px`;
+        piece.style.top = `${slotTop}px`;
+        checkPiecePosition(piece, closestRow, closestCol);
+    }
+}
+
+// Check if the piece is in the correct grid slot
+function checkPiecePosition(piece, row, col) {
+    const correctRow = parseInt(piece.dataset.correctY);
+    const correctCol = parseInt(piece.dataset.correctX);
+
+    if (row === correctRow && col === correctCol) {
+        // Correct placement
         piece.classList.add('locked');
 
         // Show status message
@@ -428,7 +398,8 @@ function checkWinCondition() {
     const lockedPieces = document.querySelectorAll('.piece.locked');
     if (lockedPieces.length === rows * cols) {
         setTimeout(() => {
-            alert('AMANDUM');
+            
+            window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
         }, 100);
     }
 }

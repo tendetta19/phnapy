@@ -1,4 +1,4 @@
-/* style.css */
+/* style.css */ 
 body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -97,8 +97,19 @@ h1 {
     border: 2px solid #333;
     background-color: #ddd;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    overflow: hidden;
+    
+    /* Dynamic Grid Lines Using CSS Variables */
+    --rows: 4;
+    --cols: 4;
+    background-image: 
+        linear-gradient(to right, rgba(0,0,0,0.5) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.5) 1px, transparent 1px);
+    background-size: calc(100% / var(--cols)) 100%, 100% calc(100% / var(--rows));
+    z-index: 1;
 }
 
+/* Puzzle Pieces */
 .piece {
     position: absolute;
     cursor: grab;
@@ -111,10 +122,18 @@ h1 {
 
 .piece.locked {
     cursor: default;
-    z-index: 1;
+    z-index: 2; /* Above grid lines */
     opacity: 0.9; /* Visual indication that the piece is locked */
-    pointer-events: none; /* Prevent interaction */
     animation: lockAnimation 0.5s forwards; /* Animation when locked */
+}
+
+.piece.locked::after {
+    content: '🔒'; /* Lock icon */
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 16px;
+    pointer-events: none;
 }
 
 @keyframes lockAnimation {
