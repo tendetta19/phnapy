@@ -1,6 +1,6 @@
 // script.js
-const rows = 4; // Number of rows
-const cols = 6; // Number of columns
+const rows =  Math.floor(Math.random() * 20) + 1; // Number of rows
+const cols =  Math.floor(Math.random() * 20) + 1; // Number of columns
 const container = document.getElementById('puzzle-container');
 const imageSrc = 'image.jpg'; // Path to your image
 
