@@ -3,14 +3,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ure dum</title>
+    <title>amadum</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Ure dum</h1>
+    <h1>amadum</h1>
+    
+    <!-- Predefined Puzzle Controls -->
+    <div class="controls">
+        <button id="next-puzzle">Next Puzzle</button>
+    </div>
+    
+    <!-- Custom Puzzle Creation Form -->
+    <div class="custom-puzzle">
+        <h2>Create Your Own Puzzle</h2>
+        <form id="custom-puzzle-form">
+            <div class="form-group">
+                <label for="custom-image">Upload Image:</label>
+                <input type="file" id="custom-image" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="num-pieces">Number of Pieces (10-40):</label>
+                <input type="number" id="num-pieces" min="2" max="40" value="20" required>
+            </div>
+            <button type="submit">Create Puzzle</button>
+        </form>
+    </div>
+    
+    <!-- Puzzle Container -->
     <div id="puzzle-wrapper">
         <div id="puzzle-container"></div>
     </div>
+    
     <script src="script.js"></script>
 </body>
 </html>

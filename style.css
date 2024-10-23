@@ -2,20 +2,76 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+.controls, .custom-puzzle {
+    margin-bottom: 20px;
+}
+
+#next-puzzle {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.custom-puzzle h2 {
+    margin-bottom: 10px;
+}
+
+.custom-puzzle form {
+    display: inline-block;
+    text-align: left;
+    background-color: #fff;
+    padding: 15px;
+    border: 2px solid #333;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.custom-puzzle .form-group {
+    margin-bottom: 10px;
+}
+
+.custom-puzzle label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.custom-puzzle input[type="file"],
+.custom-puzzle input[type="number"] {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.custom-puzzle button {
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
 }
 
 #puzzle-wrapper {
     width: 100%;
     max-width: 800px; /* Maximum width of the puzzle */
-    margin: 20px auto;
+    margin: 0 auto;
+    position: relative;
 }
 
 #puzzle-container {
     position: relative;
     width: 100%;
     padding-bottom: 66.66%; /* Aspect ratio (height/width * 100%) */
-    border: 2px solid #000;
-    background-color: #eee;
+    border: 2px solid #333;
+    background-color: #ddd;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
 .piece {
@@ -23,10 +79,13 @@ body {
     cursor: grab;
     user-select: none;
     touch-action: none; /* Prevent default touch actions */
+    box-sizing: border-box;
+    border: 1px solid #fff;
 }
 
-.piece img {
-    width: 100%;
-    height: 100%;
-    display: block;
+.piece.locked {
+    cursor: default;
+    z-index: 1;
+    /* Optionally, add a visual indication that the piece is locked */
+    opacity: 0.9;
 }
