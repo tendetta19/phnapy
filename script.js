@@ -7,6 +7,7 @@ const images = [
     'image2.jpg',
     'image4.png',
     'image3.png',
+    'image22'
     // Add more image paths as needed
 ];
 
@@ -449,10 +450,10 @@ function checkWinCondition() {
 
             // Determine which YouTube link to open based on time taken
             if (timeTaken < 300) { // Less than 5 minutes (300 seconds)
-                window.open('image3.jpg', '_blank');
+                window.open('image22.jpg', '_blank');
             } 
             else if (timeTaken < 20){
-                window.open('asdasdsa.jpg', '_blank');
+                window.open('image3.jpg', '_blank');
 
             }
             
