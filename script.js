@@ -446,7 +446,7 @@ function checkWinCondition() {
 
             // Determine which YouTube link to open based on time taken
             if (timeTaken < 300) { // Less than 5 minutes (300 seconds)
-                window.open('https://www.youtube.com/watch?v=gb95JNajKaY', '_blank');
+                window.open('image3.jpg', '_blank');
             } else {
                 window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
             }
