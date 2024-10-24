@@ -1,150 +1,89 @@
-/* style.css */ 
+/* style.css */
+
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 20px;
-}
-
-h1 {
-    margin-bottom: 10px;
-}
-
-/* Status Message Box */
-#status-message {
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #4caf50; /* Green background */
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    z-index: 1000;
-}
-
-#status-message.visible {
-    opacity: 1;
-}
-
-.hidden {
-    display: none;
-}
-
-/* Timer Display */
-#timer {
-    font-size: 18px;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-
-.controls, .custom-puzzle {
-    margin-bottom: 20px;
-}
-
-#next-puzzle, #debug-puzzle { /* Styling both buttons */
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 5px; /* Add some spacing between buttons */
-}
-
-.custom-puzzle h2 {
-    margin-bottom: 10px;
-}
-
-.custom-puzzle form {
-    display: inline-block;
-    text-align: left;
-    background-color: #fff;
-    padding: 15px;
-    border: 2px solid #333;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-}
-
-.custom-puzzle .form-group {
-    margin-bottom: 10px;
-}
-
-.custom-puzzle label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.custom-puzzle input[type="file"],
-.custom-puzzle input[type="number"] {
-    width: 100%;
-    padding: 5px;
-    box-sizing: border-box;
-}
-
-.custom-puzzle button {
-    padding: 8px 16px;
-    font-size: 14px;
-    cursor: pointer;
+    margin: 20px;
 }
 
 #puzzle-wrapper {
-    width: 100%;
-    max-width: 800px; /* Maximum width of the puzzle */
-    margin: 0 auto;
-    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #puzzle-container {
     position: relative;
-    width: 100%;
-    padding-bottom: 66.66%; /* Aspect ratio (height/width * 100%) */
-    border: 2px solid #333;
-    background-color: #ddd;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    background-color: #f0f0f0;
     overflow: hidden;
-    
-    /* Dynamic Grid Lines Using CSS Variables */
-    --rows: 4;
-    --cols: 4;
-    background-image: 
-        linear-gradient(to right, rgba(0,0,0,0.5) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0,0,0,0.5) 1px, transparent 1px);
-    background-size: calc(100% / var(--cols)) 100%, 100% calc(100% / var(--rows));
-    z-index: 1;
+    border: 2px solid #ccc;
+    margin: 20px auto;
 }
 
-/* Puzzle Pieces */
 .piece {
     position: absolute;
-    cursor: grab;
-    user-select: none;
-    touch-action: none; /* Prevent default touch actions */
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 1px solid #ddd;
     box-sizing: border-box;
-    border: 1px solid #fff;
-    transition: left 0.3s, top 0.3s, transform 0.3s; /* Smooth snapping and animation */
 }
 
 .piece.locked {
     cursor: default;
-    z-index: 2; /* Above grid lines */
-    opacity: 0.9; /* Visual indication that the piece is locked */
-    animation: lockAnimation 0.5s forwards; /* Animation when locked */
+    border: 1px solid #aaa;
 }
 
-.piece.locked::after {
-    content: '🔒'; /* Lock icon */
+.lock-icon {
     position: absolute;
-    top: 5px;
+    bottom: 5px;
     right: 5px;
-    font-size: 16px;
-    pointer-events: none;
+    width: 20px;
+    height: 20px;
+    background-image: url('lock-icon.png'); /* Replace with the path to your lock icon */
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none; /* Allows clicks to pass through the icon */
 }
 
-@keyframes lockAnimation {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+.controls, .custom-puzzle {
+    margin: 20px;
+}
+
+#status-message {
+    display: none;
+    margin: 10px;
+    font-weight: bold;
+}
+
+#status-message.visible {
+    display: block;
+}
+
+#timer {
+    margin: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.form-group {
+    margin: 10px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="file"], input[type="number"] {
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.hidden {
+    display: none;
 }

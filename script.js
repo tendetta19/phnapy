@@ -51,7 +51,6 @@ customPuzzleForm.addEventListener('submit', handleCustomPuzzle);
 function loadNextPuzzle() {
     isCustomPuzzle = false;
     container.innerHTML = '';
-    setGridSize(4, 4); // Default grid size for predefined puzzles (e.g., 4x4)
     pieces = [];
 
     if (images.length === 0) {
@@ -63,6 +62,7 @@ function loadNextPuzzle() {
     const imageSrc = images[currentImageIndex];
     console.log(`Selected image: ${imageSrc}`);
 
+    setGridSize(4, 4); // Default grid size for predefined puzzles (e.g., 4x4)
     loadImageAndCreatePuzzle(imageSrc, rows, cols);
 
     // Start the timer
@@ -119,10 +119,10 @@ function loadDebugPuzzle() {
     }
     isCustomPuzzle = false;
     container.innerHTML = '';
-    setGridSize(2, 2); // 2x2 grid = 4 pieces
     pieces = [];
     const imageSrc = images[0]; // Using the first image for debug
     console.log('Loading debug 2x2 puzzle');
+    setGridSize(2, 2); // 2x2 grid = 4 pieces
     loadImageAndCreatePuzzle(imageSrc, rows, cols);
 
     // Start the timer
@@ -131,12 +131,10 @@ function loadDebugPuzzle() {
     console.log('Timer started.');
 }
 
-// Function to set CSS variables for grid size
+// Function to set grid size
 function setGridSize(numRows, numCols) {
     rows = numRows;
     cols = numCols;
-    container.style.setProperty('--rows', rows);
-    container.style.setProperty('--cols', cols);
     console.log(`Grid size set to ${rows} rows x ${cols} columns`);
 }
 
@@ -152,10 +150,25 @@ function loadImageAndCreatePuzzle(imageSrc, numRows, numCols) {
         const originalWidth = img.width;
         const originalHeight = img.height;
 
-        // Adjust container padding-bottom to maintain aspect ratio
-        const aspectRatio = (originalHeight / originalWidth) * 100;
-        container.style.paddingBottom = `${aspectRatio}%`;
-        console.log(`Set container aspect ratio to ${aspectRatio}%`);
+        // Adjust container size to fit in the center of the screen
+        const maxContainerWidth = window.innerWidth * 0.8; // 80% of window width
+        const maxContainerHeight = window.innerHeight * 0.8; // 80% of window height
+
+        let containerWidth = originalWidth;
+        let containerHeight = originalHeight;
+
+        const widthRatio = maxContainerWidth / originalWidth;
+        const heightRatio = maxContainerHeight / originalHeight;
+        const scale = Math.min(widthRatio, heightRatio, 1);
+
+        containerWidth = originalWidth * scale;
+        containerHeight = originalHeight * scale;
+
+        container.style.width = `${containerWidth}px`;
+        container.style.height = `${containerHeight}px`;
+        container.style.position = 'relative';
+
+        console.log(`Set container dimensions to ${containerWidth}px x ${containerHeight}px`);
 
         console.log(`Grid size: ${rows} rows x ${cols} columns`);
 
@@ -166,22 +179,22 @@ function loadImageAndCreatePuzzle(imageSrc, numRows, numCols) {
         }
 
         // Create puzzle pieces
-        const pieceWidth = 100 / cols; // Percentage width
-        const pieceHeight = 100 / rows; // Percentage height
+        const pieceWidthPx = containerWidth / cols;
+        const pieceHeightPx = containerHeight / rows;
 
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
                 const piece = document.createElement('div');
                 piece.classList.add('piece');
-                piece.style.width = `${pieceWidth}%`;
-                piece.style.height = `${pieceHeight}%`;
+                piece.style.width = `${pieceWidthPx}px`;
+                piece.style.height = `${pieceHeightPx}px`;
                 piece.style.backgroundImage = `url(${imageSrc})`;
-                piece.style.backgroundSize = `${cols * 100}% ${rows * 100}%`;
-                piece.style.backgroundPosition = `${(-x * 100) / (cols - 1)}% ${(-y * 100) / (rows - 1)}%`;
+                piece.style.backgroundSize = `${containerWidth}px ${containerHeight}px`;
+                piece.style.backgroundPosition = `-${x * pieceWidthPx}px -${y * pieceHeightPx}px`;
+                piece.style.position = 'absolute';
+
                 piece.dataset.correctX = x;
                 piece.dataset.correctY = y;
-                piece.dataset.row = y;
-                piece.dataset.col = x;
 
                 pieces.push(piece);
             }
@@ -222,13 +235,8 @@ function getRandomInt(min, max) {
 
 // Randomize the position of a piece within the container
 function randomizePosition(piece) {
-    const containerRect = container.getBoundingClientRect();
-
-    const pieceWidth = containerRect.width / cols;
-    const pieceHeight = containerRect.height / rows;
-
-    const maxLeft = containerRect.width - pieceWidth;
-    const maxTop = containerRect.height - pieceHeight;
+    const maxLeft = container.offsetWidth - piece.offsetWidth;
+    const maxTop = container.offsetHeight - piece.offsetHeight;
 
     const left = Math.random() * maxLeft;
     const top = Math.random() * maxTop;
@@ -314,8 +322,8 @@ function enableDrag(element) {
         let top = clientY - containerRect.top - offsetY;
 
         // Keep within bounds
-        left = Math.max(0, Math.min(left, containerRect.width - element.offsetWidth));
-        top = Math.max(0, Math.min(top, containerRect.height - element.offsetHeight));
+        left = Math.max(0, Math.min(left, container.offsetWidth - element.offsetWidth));
+        top = Math.max(0, Math.min(top, container.offsetHeight - element.offsetHeight));
 
         element.style.left = `${left}px`;
         element.style.top = `${top}px`;
@@ -323,7 +331,7 @@ function enableDrag(element) {
 
     function endDrag() {
         isDragging = false;
-        element.style.zIndex = 2; // Reset z-index
+        element.style.zIndex = 2; // Reset z-index for unlocked pieces
         snapToGrid(element);
     }
 }
@@ -333,6 +341,12 @@ function enableUnlock(element) {
     element.addEventListener('dblclick', () => {
         if (element.classList.contains('locked')) {
             element.classList.remove('locked');
+            element.style.zIndex = 2; // Set z-index for unlocked pieces
+            // Remove lock icon
+            const lockIcon = element.querySelector('.lock-icon');
+            if (lockIcon) {
+                element.removeChild(lockIcon);
+            }
             showStatusMessage('Status: Piece has been unlocked');
         }
     });
@@ -340,31 +354,23 @@ function enableUnlock(element) {
 
 // Function to snap a piece to the nearest grid slot
 function snapToGrid(piece) {
-    const containerRect = container.getBoundingClientRect();
-    const pieceRect = piece.getBoundingClientRect();
+    const pieceLeft = parseFloat(piece.style.left);
+    const pieceTop = parseFloat(piece.style.top);
 
-    const pieceCenterX = pieceRect.left + pieceRect.width / 2 - containerRect.left;
-    const pieceCenterY = pieceRect.top + pieceRect.height / 2 - containerRect.top;
+    const pieceWidth = piece.offsetWidth;
+    const pieceHeight = piece.offsetHeight;
 
-    // Calculate which grid slot the piece center is closest to
-    const slotWidth = containerRect.width / cols;
-    const slotHeight = containerRect.height / rows;
+    const closestCol = Math.round(pieceLeft / pieceWidth);
+    const closestRow = Math.round(pieceTop / pieceHeight);
 
-    let closestCol = Math.floor(pieceCenterX / slotWidth);
-    let closestRow = Math.floor(pieceCenterY / slotHeight);
+    const slotLeft = closestCol * pieceWidth;
+    const slotTop = closestRow * pieceHeight;
 
-    // Ensure the closest grid slot is within bounds
-    closestCol = Math.min(Math.max(closestCol, 0), cols - 1);
-    closestRow = Math.min(Math.max(closestRow, 0), rows - 1);
+    const distanceX = Math.abs(pieceLeft - slotLeft);
+    const distanceY = Math.abs(pieceTop - slotTop);
 
-    const slotLeft = closestCol * slotWidth;
-    const slotTop = closestRow * slotHeight;
-
-    const toleranceX = slotWidth * 0.3; // 30% of slot width
-    const toleranceY = slotHeight * 0.3; // 30% of slot height
-
-    const distanceX = Math.abs(parseFloat(piece.style.left) - slotLeft);
-    const distanceY = Math.abs(parseFloat(piece.style.top) - slotTop);
+    const toleranceX = pieceWidth * 0.3; // 30% of piece width
+    const toleranceY = pieceHeight * 0.3; // 30% of piece height
 
     if (distanceX < toleranceX && distanceY < toleranceY) {
         // Snap to the slot
@@ -382,12 +388,22 @@ function checkPiecePosition(piece, row, col) {
     if (row === correctRow && col === correctCol) {
         // Correct placement
         piece.classList.add('locked');
+        // Move locked piece to zIndex 1
+        piece.style.zIndex = 1;
+
+        // Add lock icon
+        const lockIcon = document.createElement('div');
+        lockIcon.classList.add('lock-icon');
+        piece.appendChild(lockIcon);
 
         // Show status message
         showStatusMessage('Status: Piece has been locked into place');
 
         // Check if all pieces are locked
         checkWinCondition();
+    } else {
+        // Keep zIndex at 2 for unlocked pieces
+        piece.style.zIndex = 2;
     }
 }
 
@@ -459,6 +475,3 @@ function stopTimer() {
 function pad(number) {
     return number < 10 ? '0' + number : number;
 }
-
-
- 
