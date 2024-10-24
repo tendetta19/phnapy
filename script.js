@@ -2,6 +2,7 @@
 
 // List of predefined images to be used in the puzzle
 const images = [
+    'hard.jpg',
     'image1.jpg',
     'image2.jpg',
     // Add more image paths as needed
@@ -447,7 +448,15 @@ function checkWinCondition() {
             // Determine which YouTube link to open based on time taken
             if (timeTaken < 300) { // Less than 5 minutes (300 seconds)
                 window.open('image3.jpg', '_blank');
-            } else {
+            } 
+            else if (timeTaken < 20){
+                window.open('asdasdsa.jpg', '_blank');
+
+            }
+            
+            else
+            {
+
                 window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
             }
         }, 100);
