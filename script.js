@@ -2,8 +2,8 @@
 
 // List of predefined images to be used in the puzzle
 const images = [
-    'images/image1.jpg',
-    'images/image2.jpg',
+    'image1.jpg',
+    'image2.jpg',
     // Add more image paths as needed
 ];
 
