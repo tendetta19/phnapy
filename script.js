@@ -2,9 +2,11 @@
 
 // List of predefined images to be used in the puzzle
 const images = [
-    'hard.jpg',
+    'Ash_Phanpy.jpg',
     'image1.jpg',
     'image2.jpg',
+    'image4.png',
+    'image3.png',
     // Add more image paths as needed
 ];
 
