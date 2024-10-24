@@ -8,15 +8,17 @@ const images = [
 ];
 
 // Configuration
-const MIN_PIECES = 10;
-const MAX_PIECES = 50;
+const MIN_PIECES = 2; // Updated to 2 to ensure no puzzle with 1 piece
+const MAX_PIECES = 100;
 
 // Get DOM elements
 const container = document.getElementById('puzzle-container');
 const nextButton = document.getElementById('next-puzzle');
+const debugButton = document.getElementById('debug-puzzle'); // Debug Button
 const customPuzzleForm = document.getElementById('custom-puzzle-form');
 const customImageInput = document.getElementById('custom-image');
 const numPiecesInput = document.getElementById('num-pieces');
+const statusMessage = document.getElementById('status-message'); // Status message box
 
 // Game state
 let currentImageIndex = -1;
@@ -24,12 +26,16 @@ let rows = 0;
 let cols = 0;
 let pieces = [];
 let isCustomPuzzle = false; // Flag to determine if the current puzzle is custom
+let statusTimeout; // To manage status message timeout
 
 // Initialize the first puzzle
 loadNextPuzzle();
 
 // Event listener for "Next Puzzle" button
 nextButton.addEventListener('click', loadNextPuzzle);
+
+// Event listener for "Debug Puzzle" button
+debugButton.addEventListener('click', loadDebugPuzzle);
 
 // Event listener for custom puzzle form submission
 customPuzzleForm.addEventListener('submit', handleCustomPuzzle);
@@ -44,7 +50,7 @@ function loadNextPuzzle() {
     const imageSrc = images[currentImageIndex];
     console.log(`Selected image: ${imageSrc}`);
 
-    loadImageAndCreatePuzzle(imageSrc, getRandomInt(MIN_PIECES, MAX_PIECES));
+    loadImageAndCreatePuzzle(imageSrc, getRandomIntExcluding(MIN_PIECES, MAX_PIECES, 1));
 }
 
 // Function to handle custom puzzle creation
@@ -77,6 +83,20 @@ function handleCustomPuzzle(event) {
     reader.readAsDataURL(file);
 }
 
+// Function to load a debug 2x2 puzzle
+function loadDebugPuzzle() {
+    if (images.length === 0) {
+        alert('No images available for debug puzzle.');
+        return;
+    }
+    isCustomPuzzle = false;
+    container.innerHTML = '';
+    pieces = [];
+    const imageSrc = images[0]; // Using the first image for debug
+    console.log('Loading debug 2x2 puzzle');
+    loadImageAndCreatePuzzle(imageSrc, 4); // 2x2 grid = 4 pieces
+}
+
 // Function to load an image and create the puzzle
 function loadImageAndCreatePuzzle(imageSrc, numPieces) {
     container.innerHTML = '';
@@ -102,8 +122,9 @@ function loadImageAndCreatePuzzle(imageSrc, numPieces) {
         cols = grid.cols;
         console.log(`Grid size: ${rows} rows x ${cols} columns`);
 
-        if (rows <= 0 || cols <= 0) {
-            console.error('Invalid grid dimensions. Rows and columns must be greater than 0.');
+        if (rows <= 1 || cols <= 1) { // Extra safety
+            console.error('Invalid grid dimensions. Rows and columns must be greater than 1.');
+            alert('Failed to create puzzle. Grid dimensions invalid.');
             return;
         }
 
@@ -149,40 +170,84 @@ function loadImageAndCreatePuzzle(imageSrc, numPieces) {
 // Function to determine grid (rows and cols) based on desired number of pieces
 function determineGrid(desiredPieces) {
     // Ensure a minimum grid size to avoid 1-row or 1-column puzzles
-    const MIN_ROWS = 3;
-    const MIN_COLS = 3;
+    const MIN_ROWS = 2;
+    const MIN_COLS = 2;
+    const MAX_DIFF = 5; // Maximum allowed difference between rows and cols
 
-    let factors = [];
-    for (let i = MIN_ROWS; i <= Math.sqrt(desiredPieces); i++) {
-        if (desiredPieces % i === 0) {
-            factors.push([i, desiredPieces / i]);
+    let bestGrid = null;
+    let smallestDiff = Infinity;
+
+    // Iterate through possible row counts
+    for (let r = MIN_ROWS; r <= desiredPieces; r++) {
+        let c = Math.ceil(desiredPieces / r);
+        if (c < MIN_COLS) continue; // Ensure minimum columns
+
+        // Check if the difference between rows and columns is within the allowed range
+        if (Math.abs(r - c) > MAX_DIFF) continue;
+
+        let totalPieces = r * c;
+        let diff = Math.abs(totalPieces - desiredPieces);
+
+        // Select the grid with the smallest difference
+        if (diff < smallestDiff) {
+            smallestDiff = diff;
+            bestGrid = { rows: r, cols: c };
+        }
+
+        // If exact match is found, return immediately
+        if (diff === 0) {
+            break;
         }
     }
 
-    // If exact factors found, choose one randomly
-    if (factors.length > 0) {
-        const selected = factors[Math.floor(Math.random() * factors.length)];
-        console.log(`Exact grid found: ${selected[0]} rows x ${selected[1]} cols`);
-        return { rows: selected[0], cols: selected[1] };
+    // If a suitable grid was found within the allowed difference
+    if (bestGrid) {
+        console.log(`Optimal grid found: ${bestGrid.rows} rows x ${bestGrid.cols} cols`);
+        return bestGrid;
     }
 
-    // If no exact factors, find the closest grid with minimum rows and columns
+    // Fallback: Find the closest grid without considering the difference constraint
     let closest = [MIN_ROWS, Math.ceil(desiredPieces / MIN_ROWS)];
     let minDiff = Math.abs(closest[0] * closest[1] - desiredPieces);
 
-    for (let rows = MIN_ROWS; rows <= desiredPieces; rows++) {
-        let cols = Math.ceil(desiredPieces / rows);
-        let totalPieces = rows * cols;
+    for (let r = MIN_ROWS; r <= desiredPieces; r++) {
+        let c = Math.ceil(desiredPieces / r);
+        if (c < MIN_COLS) continue; // Ensure minimum columns
+        let totalPieces = r * c;
         let diff = Math.abs(totalPieces - desiredPieces);
         if (diff < minDiff) {
             minDiff = diff;
-            closest = [rows, cols];
+            closest = [r, c];
         }
         if (minDiff === 0) break;
     }
 
-    console.log(`Closest grid without exact factors: ${closest[0]} rows x ${closest[1]} cols`);
+    console.log(`Closest grid without difference constraint: ${closest[0]} rows x ${closest[1]} cols`);
     return { rows: closest[0], cols: closest[1] };
+}
+
+// Function to get a random integer between min and max (inclusive), excluding specific numbers
+function getRandomIntExcluding(min, max, exclude) {
+    let randomInt;
+
+    // Edge case: if the range is too small to exclude the number
+    if (max - min + 1 <= 1 && min === exclude) {
+        throw new Error('No valid numbers available to generate.');
+    }
+
+    do {
+        randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
+    } while (randomInt === exclude);
+
+    return randomInt;
+}
+
+// Shuffle an array using Fisher-Yates algorithm
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = getRandomInt(0, i);
+        [array[i], array[j]] = [array[j], array[i]];
+    }
 }
 
 // Function to get a random integer between min and max (inclusive), but never returns 1
@@ -195,15 +260,6 @@ function getRandomInt(min, max) {
     } while (randomInt === 1);
 
     return randomInt;
-}
-
-
-// Shuffle an array using Fisher-Yates algorithm
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = getRandomInt(0, i);
-        [array[i], array[j]] = [array[j], array[i]];
-    }
 }
 
 // Randomize the position of a piece within the container
@@ -226,7 +282,6 @@ function randomizePosition(piece) {
 // Enable drag-and-drop for a piece
 function enableDrag(element) {
     let offsetX, offsetY;
-    let initialX, initialY;
     let isDragging = false;
 
     // Mouse Events
@@ -290,9 +345,6 @@ function enableDrag(element) {
         offsetX = clientX - rect.left;
         offsetY = clientY - rect.top;
 
-        initialX = parseFloat(element.style.left);
-        initialY = parseFloat(element.style.top);
-
         // Bring the dragged piece to the front
         element.style.zIndex = 1000;
     }
@@ -318,7 +370,7 @@ function enableDrag(element) {
     }
 }
 
-// Check if the piece is in the correct position
+// Check if the piece is in the correct position (with a tolerance)
 function checkPiecePosition(piece) {
     const containerRect = container.getBoundingClientRect();
     const pieceWidth = containerRect.width / cols;
@@ -330,8 +382,8 @@ function checkPiecePosition(piece) {
     const correctX = piece.dataset.correctX * pieceWidth;
     const correctY = piece.dataset.correctY * pieceHeight;
 
-    const toleranceX = pieceWidth * 0.1; // 10% of piece width
-    const toleranceY = pieceHeight * 0.1; // 10% of piece height
+    const toleranceX = pieceWidth * 0.15; // 15% of piece width
+    const toleranceY = pieceHeight * 0.15; // 15% of piece height
 
     if (
         Math.abs(currentX - correctX) < toleranceX &&
@@ -342,9 +394,33 @@ function checkPiecePosition(piece) {
         piece.style.top = `${correctY}px`;
         piece.classList.add('locked');
 
+        // Show status message
+        showStatusMessage('Status: Piece has been locked into place');
+
         // Check if all pieces are locked
         checkWinCondition();
     }
+}
+
+// Function to show status message
+function showStatusMessage(message) {
+    // Update message text
+    statusMessage.textContent = message;
+
+    // Make the status message visible
+    statusMessage.classList.add('visible');
+    statusMessage.classList.remove('hidden');
+
+    // Clear any existing timeout
+    if (statusTimeout) {
+        clearTimeout(statusTimeout);
+    }
+
+    // Hide the message after 5 seconds
+    statusTimeout = setTimeout(() => {
+        statusMessage.classList.remove('visible');
+        statusMessage.classList.add('hidden');
+    }, 5000);
 }
 
 // Check if all pieces are in the correct position

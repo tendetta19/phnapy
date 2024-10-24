@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,9 +8,13 @@
 <body>
     <h1>amadum</h1>
     
+    <!-- Status Message Box -->
+    <div id="status-message" class="hidden">Status: Piece has been locked into place</div>
+    
     <!-- Predefined Puzzle Controls -->
     <div class="controls">
         <button id="next-puzzle">Next Puzzle</button>
+        <button id="debug-puzzle">Load 2x2 Puzzle (Debug)</button> <!-- Debug Button Added -->
     </div>
     
     <!-- Custom Puzzle Creation Form -->
@@ -23,8 +26,8 @@
                 <input type="file" id="custom-image" accept="image/*" required>
             </div>
             <div class="form-group">
-                <label for="num-pieces">Number of Pieces (10-40):</label>
-                <input type="number" id="num-pieces" min="10" max="50" value="20" required>
+                <label for="num-pieces">Number of Pieces (2-40):</label>
+                <input type="number" id="num-pieces" min="2" max="40" value="20" required>
             </div>
             <button type="submit">Create Puzzle</button>
         </form>
@@ -38,3 +41,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+    
