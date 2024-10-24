@@ -8,8 +8,8 @@ const images = [
 ];
 
 // Configuration
-const MIN_PIECES = 1;
-const MAX_PIECES = 100;
+const MIN_PIECES = 10;
+const MAX_PIECES = 50;
 
 // Get DOM elements
 const container = document.getElementById('puzzle-container');
@@ -185,10 +185,18 @@ function determineGrid(desiredPieces) {
     return { rows: closest[0], cols: closest[1] };
 }
 
-// Function to get a random integer between min and max (inclusive)
+// Function to get a random integer between min and max (inclusive), but never returns 1
 function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    let randomInt;
+
+    // Keep generating a random number until it's not 1
+    do {
+        randomInt = Math.floor(Math.random() * (max - min + 1)) + min;
+    } while (randomInt === 1);
+
+    return randomInt;
 }
+
 
 // Shuffle an array using Fisher-Yates algorithm
 function shuffleArray(array) {
@@ -228,6 +236,9 @@ function enableDrag(element) {
     element.addEventListener('touchstart', onTouchStart, { passive: false });
 
     function onMouseDown(e) {
+        if (element.classList.contains('locked')) {
+            return; // Do not initiate drag if the piece is locked
+        }
         e.preventDefault();
         startDrag(e.clientX, e.clientY);
         document.addEventListener('mousemove', onMouseMove);
@@ -249,6 +260,9 @@ function enableDrag(element) {
 
     // Touch Handlers
     function onTouchStart(e) {
+        if (element.classList.contains('locked')) {
+            return; // Do not initiate drag if the piece is locked
+        }
         e.preventDefault();
         const touch = e.touches[0];
         startDrag(touch.clientX, touch.clientY);
@@ -328,15 +342,7 @@ function checkPiecePosition(piece) {
         piece.style.top = `${correctY}px`;
         piece.classList.add('locked');
 
-        // Remove drag event listeners by cloning the node
-        const clonedPiece = piece.cloneNode(true);
-        clonedPiece.classList.add('locked');
-        clonedPiece.style.cursor = 'default';
-        clonedPiece.style.zIndex = 1;
-        clonedPiece.removeEventListener('mousedown', onMouseDown);
-        clonedPiece.removeEventListener('touchstart', onTouchStart);
-        piece.parentNode.replaceChild(clonedPiece, piece);
-
+        // Check if all pieces are locked
         checkWinCondition();
     }
 }
