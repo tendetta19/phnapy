@@ -2,8 +2,8 @@
 
 // List of predefined images to be used in the puzzle
 const images = [
-    'image1.jpg',
-    'image2.jpg',
+    'images/image1.jpg',
+    'images/image2.jpg',
     // Add more image paths as needed
 ];
 
@@ -22,6 +22,7 @@ const customImageInput = document.getElementById('custom-image');
 const numRowsInput = document.getElementById('num-rows');
 const numColsInput = document.getElementById('num-cols');
 const statusMessage = document.getElementById('status-message'); // Status message box
+const timerDisplay = document.getElementById('timer'); // Timer display
 
 // Game state
 let currentImageIndex = -1;
@@ -30,8 +31,11 @@ let cols = 0;
 let pieces = [];
 let isCustomPuzzle = false; // Flag to determine if the current puzzle is custom
 let statusTimeout; // To manage status message timeout
+let timerInterval; // To store the interval ID for the timer
+let elapsedSeconds = 0; // To track elapsed time
+let startTime; // To store the time when the puzzle starts
 
-// Initialize the first puzzle
+// Initialize the first puzzle when the window loads
 window.onload = loadNextPuzzle;
 
 // Event listener for "Next Puzzle" button
@@ -60,6 +64,11 @@ function loadNextPuzzle() {
     console.log(`Selected image: ${imageSrc}`);
 
     loadImageAndCreatePuzzle(imageSrc, rows, cols);
+
+    // Start the timer
+    startTime = new Date();
+    startTimer();
+    console.log('Timer started.');
 }
 
 // Function to handle custom puzzle creation
@@ -90,6 +99,11 @@ function handleCustomPuzzle(event) {
         isCustomPuzzle = true;
         setGridSize(numRows, numCols);
         loadImageAndCreatePuzzle(imageSrc, numRows, numCols);
+
+        // Start the timer
+        startTime = new Date();
+        startTimer();
+        console.log('Timer started.');
     };
     reader.onerror = function() {
         alert('Failed to read the image file. Please try again.');
@@ -110,6 +124,11 @@ function loadDebugPuzzle() {
     const imageSrc = images[0]; // Using the first image for debug
     console.log('Loading debug 2x2 puzzle');
     loadImageAndCreatePuzzle(imageSrc, rows, cols);
+
+    // Start the timer
+    startTime = new Date();
+    startTimer();
+    console.log('Timer started.');
 }
 
 // Function to set CSS variables for grid size
@@ -398,8 +417,48 @@ function checkWinCondition() {
     const lockedPieces = document.querySelectorAll('.piece.locked');
     if (lockedPieces.length === rows * cols) {
         setTimeout(() => {
-            
-            window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+            // Stop the timer
+            stopTimer();
+
+            // Calculate elapsed time
+            const endTime = new Date();
+            const timeTaken = (endTime - startTime) / 1000; // Time in seconds
+            console.log(`Time taken to complete the puzzle: ${timeTaken} seconds`);
+
+            // Display congratulations alert
+            alert('Congratulations! You have completed the puzzle.');
+
+            // Determine which YouTube link to open based on time taken
+            if (timeTaken < 300) { // Less than 5 minutes (300 seconds)
+                window.open('https://www.youtube.com/watch?v=gb95JNajKaY', '_blank');
+            } else {
+                window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+            }
         }, 100);
     }
 }
+
+// Function to start the timer
+function startTimer() {
+    elapsedSeconds = 0;
+    timerDisplay.textContent = 'Time: 00:00';
+    timerInterval = setInterval(() => {
+        elapsedSeconds++;
+        const minutes = Math.floor(elapsedSeconds / 60);
+        const seconds = elapsedSeconds % 60;
+        timerDisplay.textContent = `Time: ${pad(minutes)}:${pad(seconds)}`;
+    }, 1000);
+}
+
+// Function to stop the timer
+function stopTimer() {
+    clearInterval(timerInterval);
+}
+
+// Helper function to pad numbers with leading zeros
+function pad(number) {
+    return number < 10 ? '0' + number : number;
+}
+
+
+ 
