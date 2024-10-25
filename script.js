@@ -126,7 +126,7 @@ function loadDebugPuzzle() {
     pieces = [];
     const imageSrc = images[0]; // Using the first image for debug
     console.log('Loading debug 2x2 puzzle');
-    setGridSize(2, 2); // 2x2 grid = 4 pieces
+    setGridSize(1000, 1000); // 2x2 grid = 4 pieces
     loadImageAndCreatePuzzle(imageSrc, rows, cols);
 
     // Start the timer
