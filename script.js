@@ -2,7 +2,7 @@
 
 // List of predefined images to be used in the puzzle
 const images = [
-	'image5.png'
+	'image5.png',
     'image56.jpg',
     'Ash_Phanpy.jpg',
     'image1.jpg',
@@ -22,7 +22,7 @@ const MAX_COLS = 10; // Maximum number of columns
 // Get DOM elements
 const container = document.getElementById('puzzle-container');
 const nextButton = document.getElementById('next-puzzle');
-const debugButton = document.getElementById('debug-puzzle'); // Debug Button
+//const debugButton = document.getElementById('debug-puzzle'); // Debug Button
 const customPuzzleForm = document.getElementById('custom-puzzle-form');
 const customImageInput = document.getElementById('custom-image');
 const numRowsInput = document.getElementById('num-rows');
@@ -48,7 +48,7 @@ window.onload = loadNextPuzzle;
 nextButton.addEventListener('click', loadNextPuzzle);
 
 // Event listener for "Debug Puzzle" button
-debugButton.addEventListener('click', loadDebugPuzzle);
+//debugButton.addEventListener('click', loadDebugPuzzle);
 
 // Event listener for custom puzzle form submission
 customPuzzleForm.addEventListener('submit', handleCustomPuzzle);
@@ -118,24 +118,24 @@ function handleCustomPuzzle(event) {
 }
 
 // Function to load a debug 2x2 puzzle
-function loadDebugPuzzle() {
-    if (images.length === 0) {
-        alert('No images available for debug puzzle.');
-        return;
-    }
-    isCustomPuzzle = false;
-    container.innerHTML = '';
-    pieces = [];
-    const imageSrc = images[0]; // Using the first image for debug
-    console.log('Loading debug 2x2 puzzle');
-    setGridSize( 2, 2); // 2x2 grid = 4 pieces
-    loadImageAndCreatePuzzle(imageSrc, rows, cols);
+// function loadDebugPuzzle() {
+//     if (images.length === 0) {
+//         alert('No images available for debug puzzle.');
+//         return;
+//     }
+//     isCustomPuzzle = false;
+//     container.innerHTML = '';
+//     pieces = [];
+//     const imageSrc = images[0]; // Using the first image for debug
+//     console.log('Loading debug 2x2 puzzle');
+//     setGridSize( 2, 2); // 2x2 grid = 4 pieces
+//     loadImageAndCreatePuzzle(imageSrc, rows, cols);
 
-    // Start the timer
-    startTime = new Date();
-    startTimer();
-    console.log('Timer started.');
-}
+//     // Start the timer
+//     startTime = new Date();
+//     startTimer();
+//     console.log('Timer started.');
+// }
 
 // Function to set grid size
 function setGridSize(numRows, numCols) {
