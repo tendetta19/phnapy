@@ -454,7 +454,7 @@ function checkWinCondition() {
             if (timeTaken < 300) { // Less than 5 minutes (300 seconds)
                 window.open('image22.jpg', '_blank');
             } 
-            else if (timeTaken < 26){
+            else if (timeTaken < 40){
                 window.open('26oct.jpg', '_blank');
 
             }
