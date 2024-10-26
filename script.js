@@ -2,6 +2,7 @@
 
 // List of predefined images to be used in the puzzle
 const images = [
+	'image5.png'
     'image56.jpg',
     'Ash_Phanpy.jpg',
     'image1.jpg',
@@ -454,7 +455,7 @@ function checkWinCondition() {
                 window.open('image22.jpg', '_blank');
             } 
             else if (timeTaken < 20){
-                window.open('image3.jpg', '_blank');
+                window.open('26oct.jpg', '_blank');
 
             }
             
