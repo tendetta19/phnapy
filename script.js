@@ -3,6 +3,7 @@
 // List of predefined images to be used in the puzzle
 const images = [
 	'image5.png',
+    '26oct.jpg',
     'image56.jpg',
     'Ash_Phanpy.jpg',
     'image1.jpg',
