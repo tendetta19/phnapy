@@ -1,8 +1,7 @@
 // script.js
 
 // List of predefined images to be used in the puzzle
-const images = [
-	'https://pbs.twimg.com/media/GbIlpZEbUAA_Ywe?format=jpg&name=medium',
+const images = [ 
 	'oct31.png',
 	'oct27.png',
 	'image5.png',
