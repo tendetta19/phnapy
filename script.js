@@ -2,13 +2,14 @@
 
 // List of predefined images to be used in the puzzle
 const images = [
-    'oct27.png',
+	'oct31.jpg',
+	'oct27.png',
 	'image5.png',
-    '26oct.jpg',
-    'image56.jpg',
-    'Ash_Phanpy.jpg',
-    'image1.jpg',
-    'image2.jpg',
+	'26oct.jpg',
+	'image56.jpg',
+	'Ash_Phanpy.jpg',
+	'image1.jpg',
+	'image2.jpg',
     'image4.png',
     'image3.png',
     'image22'
