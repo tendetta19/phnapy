@@ -2,7 +2,7 @@
 
 // List of predefined images to be used in the puzzle
 const images = [ 
-	'https://pbs.twimg.com/media/GbOW4sPbIAAlWeL?format=jpg&name=large',
+	'https://pbs.twimg.com/media/GbNxOu5akAA1x0T?format=jpg&name=medium',
 	'oct31.png',
 	'oct27.png',
 	'image5.png',
