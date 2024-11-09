@@ -2,7 +2,7 @@
 
 // List of predefined images to be used in the puzzle
 const images = [ 
-	'speed.jpg',
+	'tm.jpg',
 	'https://pbs.twimg.com/media/Gby7OBea4AA1JuT?format=jpg&name=4096x4096',
 	'https://pbs.twimg.com/media/Gbx3uEpb0AAodOi?format=jpg&name=large',
 	'https://pbs.twimg.com/media/GZ8G5gUb0AE-BQ5?format=jpg&name=large',
@@ -469,7 +469,7 @@ function checkWinCondition() {
                 window.open('https://pbs.twimg.com/media/Gby7ONcaQAE9RJ0?format=jpg&name=4096x4096', '_blank');
             } 
             else if (timeTaken < 40){
-                window.open('speed2.jpg', '_blank');
+                window.open('tmr.jpg', '_blank');
 
             }
             
