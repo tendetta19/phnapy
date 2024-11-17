@@ -468,7 +468,7 @@ function checkWinCondition() {
 
             // Determine which YouTube link to open based on time taken
             if (timeTaken < 300) { // Less than 5 minutes (300 seconds)
-                window.open('https://pbs.twimg.com/media/GcL34W_asAIq__T?format=jpg&name=large', '_blank');
+                window.open('https://pbs.twimg.com/media/Gcjs6ltaMAAABP5?format=jpg&name=medium', '_blank');
             } 
             else if (timeTaken < 40){
                 window.open('tmr.jpg', '_blank');
