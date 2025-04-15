@@ -2,6 +2,7 @@
 
 // List of predefined images to be used in the puzzle
 const images = [ 
+	'secret.jpg'
 	'https://pbs.twimg.com/media/GeLvFGJaYAA9gJl?format=jpg&name=4096x4096',
 	'https://pbs.twimg.com/media/GQ-mOlBbwAIIo8f?format=jpg&name=4096x4096',
 	'https://pbs.twimg.com/media/GcLpmYpasAAs5Md?format=jpg&name=large',
@@ -469,7 +470,7 @@ function checkWinCondition() {
 
             // Determine which YouTube link to open based on time taken
             if (timeTaken < 300) { // Less than 5 minutes (300 seconds)
-                window.open('https://pbs.twimg.com/media/GeLvFGLbcAAvGMC?format=jpg&name=4096x4096', '_blank');
+                window.open('secret.jpg', '_blank');
             } 
             else if (timeTaken < 40){
                 window.open('tmr.jpg', '_blank');
