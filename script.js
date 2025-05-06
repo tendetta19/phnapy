@@ -2,6 +2,7 @@
 
 // List of predefined images to be used in the puzzle
 const images = [ 
+	'pokedolls.png',
 	'https://pbs.twimg.com/media/GokXDYwWkAMxyF2?format=jpg&name=large',
 	'secret.jpg',
 	'https://pbs.twimg.com/media/GeLvFGJaYAA9gJl?format=jpg&name=4096x4096',
@@ -471,10 +472,10 @@ function checkWinCondition() {
 
             // Determine which YouTube link to open based on time taken
             if (timeTaken < 300) { // Less than 5 minutes (300 seconds)
-                window.open('https://pbs.twimg.com/media/GokXDYwWkAMxyF2?format=jpg&name=large', '_blank');
+                window.open('pokedolls.png', '_blank');
             } 
             else if (timeTaken < 40){
-                window.open('tmr.jpg', '_blank');
+                window.open('pokedolls.png', '_blank');
 
             }
             
